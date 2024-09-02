@@ -11,7 +11,7 @@ enum class TokenType {
     STRING,
     NUMBER,
     BOOLEAN,
-    NULL
+    NULL_TYPE
 };
 
 #endif

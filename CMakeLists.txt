@@ -8,7 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # enable_testing()
 
 # source files
-set(SOURCES src/main.cpp)
+set(SOURCES src/main.cpp src/Lexer.cpp)
+file(COPY resources DESTINATION .)
 
 # executable
 add_executable(${PROJECT_NAME} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC include)
