@@ -33,6 +33,30 @@ namespace {
             if (std::isspace(current_char)) {
                 ++current_pos;
                 continue;
+            } else if (current_char == '{') {
+                ++current_pos;
+                lex_left_brace(lexer);
+                continue;
+            } else if (current_char == '}') {
+                ++current_pos;
+                lex_right_brace(lexer);
+                continue;
+            } else if (current_char == '[') {
+                ++current_pos;
+                lex_left_bracket(lexer);
+                continue;
+            } else if (current_char == ']') {
+                ++current_pos;
+                lex_right_bracket(lexer);
+                continue;
+            } else if (current_char == ':') {
+                ++current_pos;
+                lex_colon(lexer);
+                continue;
+            } else if (current_char == ',') {
+                ++current_pos;
+                lex_comma(lexer);
+                continue;
             }
         }
     }
