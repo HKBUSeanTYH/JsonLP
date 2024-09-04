@@ -1,28 +1,8 @@
 #include "Lexer.hpp"
 
 namespace {
-    void lex_left_brace(Lexer& lexer) {
-        lexer.pushback_token(LexToken {TokenType::LEFT_BRACE, "{"});
-    }
-
-    void lex_right_brace(Lexer& lexer) {
-        lexer.pushback_token(LexToken {TokenType::RIGHT_BRACE, "}"});
-    }
-
-    void lex_left_bracket(Lexer& lexer) {
-        lexer.pushback_token(LexToken {TokenType::LEFT_BRACKET, "["});
-    }
-
-    void lex_right_bracket(Lexer& lexer) {
-        lexer.pushback_token(LexToken {TokenType::RIGHT_BRACKET, "]"});
-    }
-
-    void lex_colon(Lexer& lexer) {
-        lexer.pushback_token(LexToken {TokenType::COLON, ":"});
-    }
-
-    void lex_comma(Lexer& lexer) {
-        lexer.pushback_token(LexToken {TokenType::RIGHT_BRACE, ","});
+    void lex_token(Lexer& lexer, const TokenType& type, const std::string& token_string) {
+        lexer.pushback_token(LexToken {type, token_string});
     }
 
     void lex(std::istringstream& iss, Lexer& lexer) {
@@ -35,27 +15,27 @@ namespace {
                 continue;
             } else if (current_char == '{') {
                 ++current_pos;
-                lex_left_brace(lexer);
+                lex_token(lexer, TokenType::LEFT_BRACE, "{");
                 continue;
             } else if (current_char == '}') {
                 ++current_pos;
-                lex_right_brace(lexer);
+                lex_token(lexer, TokenType::RIGHT_BRACE, "}");
                 continue;
             } else if (current_char == '[') {
                 ++current_pos;
-                lex_left_bracket(lexer);
+                lex_token(lexer, TokenType::LEFT_BRACKET, "[");
                 continue;
             } else if (current_char == ']') {
                 ++current_pos;
-                lex_right_bracket(lexer);
+                lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
                 continue;
             } else if (current_char == ':') {
                 ++current_pos;
-                lex_colon(lexer);
+                lex_token(lexer, TokenType::COLON, ":");
                 continue;
             } else if (current_char == ',') {
                 ++current_pos;
-                lex_comma(lexer);
+                lex_token(lexer, TokenType::RIGHT_BRACE, ",");
                 continue;
             }
         }
