@@ -18,35 +18,35 @@ namespace {
                 ++current_pos;
             } else if (current_char == '}') {
                 lex_token(lexer, TokenType::RIGHT_BRACE, "}");
-                ++current_pos;                
+                ++current_pos;
             } else if (current_char == '[') {
                 lex_token(lexer, TokenType::LEFT_BRACKET, "[");
                 ++current_pos;
             } else if (current_char == ']') {
                 lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
-                ++current_pos;                
+                ++current_pos;
             } else if (current_char == ':') {
                 lex_token(lexer, TokenType::COLON, ":");
-                ++current_pos;                
+                ++current_pos;
             } else if (current_char == ',') {
                 lex_token(lexer, TokenType::COMMA, ",");
-                ++current_pos;                
+                ++current_pos;
             } else if (current_char == '"') {
                 size_t opening_idx {++current_pos};
                 while(current_pos < str_length && str_view[current_pos] != '"') {
                     ++current_pos;
                 }
                 lex_token(lexer, TokenType::STRING, std::string{str_view.substr(opening_idx, current_pos - opening_idx)});
-                ++current_pos;                
+                ++current_pos;
             } else if (current_char == 't' && str_view.substr(current_pos, 4) == "true"sv) {
                 lex_token(lexer, TokenType::BOOLEAN, "true");
-                current_pos += 4;                
+                current_pos += 4;
             } else if (current_char == 'f' && str_view.substr(current_pos, 5) == "false"sv) {
                 lex_token(lexer, TokenType::BOOLEAN, "false");
-                current_pos += 5;                
+                current_pos += 5;
             } else if (current_char == 'n' && str_view.substr(current_pos, 4) == "null"sv) {
                 lex_token(lexer, TokenType::NULL_TYPE, "null");
-                current_pos += 4;                
+                current_pos += 4;
             }
         }
     }
