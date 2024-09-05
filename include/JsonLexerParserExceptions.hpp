@@ -1,5 +1,5 @@
-#ifndef JSON_ERROR_DEF
-#define JSON_ERROR_DEF
+#ifndef JSON_LEXER_PARSER_EXCEPTIONS_DEF
+#define JSON_LEXER_PARSER_EXCEPTIONS_DEF
 #include <optional>
 enum PossibleExceptions {
     JsonSyntaxException,  // missing/extra commas, improper use of quotes, mismatched brackets/braces
