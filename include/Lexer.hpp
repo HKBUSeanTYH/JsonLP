@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string_view>
 class Lexer {
     std::vector<LexToken> tokens;
     public:
