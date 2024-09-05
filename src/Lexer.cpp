@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include "JsonLexerParserExceptions.hpp"
 
 namespace {
     void lex_token(Lexer& lexer, const TokenType& type, const std::string token_string) {
