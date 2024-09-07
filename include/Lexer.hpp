@@ -12,6 +12,7 @@ class Lexer {
     public:
         Lexer(): tokens{} {};
         void pushback_token(const LexToken&);
+        void clear_tokens();
         friend std::istream& operator>>(std::istream&, Lexer&);
         friend std::istringstream& operator>>(std::istringstream&, Lexer&);
         friend std::ostream& operator<<(std::ostream&, Lexer&);

@@ -43,7 +43,6 @@ namespace {
             } else if (current_char == ',' || current_char == '}' || current_char == ']' || std::isspace(current_char)) {
                 //if valid ending delimiter
                 lex_token(lexer, TokenType::NUMBER, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
-                ++current_pos;
                 return {};  //finished lexing numeric, break out
             } else {
                 return PossibleExceptions::MalformedJsonException; //invalid characters
@@ -113,6 +112,10 @@ namespace {
 
 void Lexer::pushback_token(const LexToken& token) {
     this->tokens.push_back(token);
+}
+
+void Lexer::clear_tokens() {
+    this->tokens.clear();
 }
 
 std::istream& operator >>(std::istream& is, Lexer& lexer) {
