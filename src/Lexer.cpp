@@ -51,7 +51,6 @@ namespace {
         //if somehow string ended without breaking out, lex the token first and decide if it is malformed later
         //as the string could be completely numeric - "1234"
         lex_token(lexer, TokenType::NUMBER, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
-        ++current_pos;
         return {};
     }
 
