@@ -15,7 +15,7 @@ int main() {
     std::cout << lexer << std::endl;
     lexer.clear_tokens();
 
-    iss.str("{\"test\": .789}");
+    iss.str("789");
     iss >> lexer;
     std::cout << lexer << std::endl;
     lexer.clear_tokens();
