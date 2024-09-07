@@ -121,7 +121,10 @@ std::istream& operator >>(std::istream& is, Lexer& lexer) {
         std::istreambuf_iterator<char> start(is), end;
         std::string input_str(start, end);
         std::istringstream iss{input_str};
-        lex(iss, lexer);
+        JsonLexerParserException output {lex(iss, lexer)};
+        if (output.has_value()) {
+            iss.setstate(iss.rdstate() | std::ios_base::failbit);
+        } 
     } else {
         is.setstate(is.rdstate() | std::ios_base::failbit);
     }
@@ -131,7 +134,10 @@ std::istream& operator >>(std::istream& is, Lexer& lexer) {
 std::istringstream& operator >>(std::istringstream& iss, Lexer& lexer) {
     std::istringstream::sentry sentry{iss};  //trims leading whitespace
     if (sentry) {
-        lex(iss, lexer);
+        JsonLexerParserException output {lex(iss, lexer)};
+        if (output.has_value()) {
+            iss.setstate(iss.rdstate() | std::ios_base::failbit);
+        } 
     } else {
         iss.setstate(iss.rdstate() | std::ios_base::failbit);
     }
@@ -145,7 +151,7 @@ std::ostream& operator<<(std::ostream& os, Lexer& lexer) {
         os << "[ "s;
         if (lexer.tokens.size() >= 1) {
             if (lexer.tokens.size() > 1) {
-                std::for_each_n(lexer.tokens.begin(), lexer.tokens.size()-2, [&os](LexToken& token){ os << token << ", "s; });
+                std::for_each_n(lexer.tokens.begin(), lexer.tokens.size()-1, [&os](LexToken& token){ os << token << ", "s; });
             }
             os << lexer.tokens.at(lexer.tokens.size()-1);
         }
