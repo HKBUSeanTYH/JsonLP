@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string_view>
+#include <algorithm>
 class Lexer {
     std::vector<LexToken> tokens;
     public:
@@ -13,5 +14,6 @@ class Lexer {
         void pushback_token(const LexToken&);
         friend std::istream& operator>>(std::istream&, Lexer&);
         friend std::istringstream& operator>>(std::istringstream&, Lexer&);
+        friend std::ostream& operator<<(std::ostream&, Lexer&);
 };
 #endif

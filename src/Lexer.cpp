@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include "NumericString.hpp"
 #include "JsonLexerParserExceptions.hpp"
 
 namespace {
@@ -6,7 +7,56 @@ namespace {
         lexer.pushback_token(LexToken {type, token_string});
     }
 
-    void lex(std::istringstream& iss, Lexer& lexer) {
+    JsonLexerParserException validate_numeric_string (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
+        bool floating_point_found = false, exponential_found = false;
+        size_t starting_pos {current_pos};
+        if (NumericString::is_plus_minus_or_floating_point(sv[current_pos])) {
+            if (sv[current_pos] == '.') {
+                floating_point_found = true;
+            }
+            if (!std::isdigit(sv[current_pos+1])) {
+                return PossibleExceptions::MalformedJsonException;
+            } 
+            current_pos += 2;
+        }
+
+        while (current_pos < str_length) {
+            char current_char {sv[current_pos]};
+            if (std::isdigit(current_char)) {
+                ++current_pos;
+            } else if (current_char == 'e') {
+                if (!exponential_found && (NumericString::is_plus_minus_or_digit(sv[current_pos+1]))) {  
+                    //if an exponent symbol is not found and + - or digit is after exponent
+                    exponential_found = true;
+                    current_pos += 2;
+                } else {
+                    return PossibleExceptions::MalformedJsonException;
+                }
+            } else if (current_char == '.' && !floating_point_found) {
+                //if floating point and no floating points seen before
+                floating_point_found = true;
+                if (!std::isdigit(sv[current_pos+1])) {
+                    //floating point must be followed by digit
+                    return PossibleExceptions::MalformedJsonException;
+                } 
+                current_pos += 2;
+            } else if (current_char == ',' || current_char == '}' || current_char == ']' || std::isspace(current_char)) {
+                //if valid ending delimiter
+                lex_token(lexer, TokenType::NUMBER, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+                ++current_pos;
+                return {};  //finished lexing numeric, break out
+            } else {
+                return PossibleExceptions::MalformedJsonException; //invalid characters
+            }
+        }
+        //if somehow string ended without breaking out, lex the token first and decide if it is malformed later
+        //as the string could be completely numeric - "1234"
+        lex_token(lexer, TokenType::NUMBER, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+        ++current_pos;
+        return {};
+    }
+
+    JsonLexerParserException lex(std::istringstream& iss, Lexer& lexer) {
         using namespace std::literals;
         std::string_view str_view {iss.view()};
         size_t current_pos{0}, str_length {str_view.length()};
@@ -48,8 +98,16 @@ namespace {
             } else if (current_char == 'n' && str_view.substr(current_pos, 4) == "null"sv) {
                 lex_token(lexer, TokenType::NULL_TYPE, "null");
                 current_pos += 4;
+            } else if (NumericString::is_valid_numeric_string_start(current_char)) {
+                JsonLexerParserException output {validate_numeric_string(lexer, str_view, str_length, current_pos)};
+                if (output.has_value()) {
+                    return output;
+                }
+            } else {
+                return PossibleExceptions::MalformedJsonException;
             }
         }
+        return {};
     }
 }
 
@@ -78,4 +136,22 @@ std::istringstream& operator >>(std::istringstream& iss, Lexer& lexer) {
         iss.setstate(iss.rdstate() | std::ios_base::failbit);
     }
     return iss;
+}
+
+std::ostream& operator<<(std::ostream& os, Lexer& lexer) {
+    std::ostream::sentry sentry {os};
+    if (sentry) {
+        using namespace std::string_literals;
+        os << "[ "s;
+        if (lexer.tokens.size() >= 1) {
+            if (lexer.tokens.size() > 1) {
+                std::for_each_n(lexer.tokens.begin(), lexer.tokens.size()-2, [&os](LexToken& token){ os << token << ", "s; });
+            }
+            os << lexer.tokens.at(lexer.tokens.size()-1);
+        }
+        os << " ]"s;
+    } else {
+        os.setstate(os.rdstate() | std::ios_base::failbit);
+    }
+    return os;
 }

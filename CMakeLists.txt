@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # enable_testing()
 
 # source files
-set(SOURCES src/main.cpp src/Lexer.cpp)
+set(SOURCES src/main.cpp src/Lexer.cpp src/LexToken.cpp src/NumericString.cpp)
 file(COPY resources DESTINATION .)
 
 # executable
