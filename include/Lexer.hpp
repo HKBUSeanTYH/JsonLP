@@ -6,7 +6,7 @@
 
 class Lexer {
     std::vector<LexToken> tokens;
-    std::stack<TokenType> array_and_object_stack;
+    std::stack<TokenType, std::vector<TokenType>> array_and_object_stack;
     public:
         Lexer(): tokens{}, array_and_object_stack{} {};
         void pushback_token(const LexToken&);
