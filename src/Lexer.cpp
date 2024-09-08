@@ -7,7 +7,7 @@ namespace {
         lexer.pushback_token(LexToken {type, token_string});
     }
 
-    JsonLexerParserException validate_numeric_string (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
+    JsonLexerParserException validate_and_extract_numeric (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
         bool floating_point_found = false, exponential_found = false;
         size_t starting_pos {current_pos};
         if (NumericString::is_plus_minus_or_floating_point(sv[current_pos])) {
@@ -113,7 +113,7 @@ namespace {
                 lex_token(lexer, TokenType::NULL_TYPE, "null");
                 current_pos += 4;
             } else if (NumericString::is_valid_numeric_string_start(current_char)) {
-                JsonLexerParserException output {validate_numeric_string(lexer, str_view, str_length, current_pos)};
+                JsonLexerParserException output {validate_and_extract_numeric(lexer, str_view, str_length, current_pos)};
                 if (output.has_value()) {
                     return output;
                 }
