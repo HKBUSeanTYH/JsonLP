@@ -64,16 +64,28 @@ namespace {
                 ++current_pos;
             } else if (current_char == '{') {
                 lex_token(lexer, TokenType::LEFT_BRACE, "{");
+                lexer.stack_token_type(TokenType::LEFT_BRACE);
                 ++current_pos;
             } else if (current_char == '}') {
-                lex_token(lexer, TokenType::RIGHT_BRACE, "}");
-                ++current_pos;
+                if (lexer.ensure_nonzero_stack() && lexer.check_token_type(TokenType::LEFT_BRACE)) {
+                    lexer.pop_token_type();
+                    lex_token(lexer, TokenType::RIGHT_BRACE, "}");
+                    ++current_pos;
+                } else {
+                    return PossibleExceptions::MalformedJsonException;
+                }
             } else if (current_char == '[') {
                 lex_token(lexer, TokenType::LEFT_BRACKET, "[");
+                lexer.stack_token_type(TokenType::LEFT_BRACKET);
                 ++current_pos;
             } else if (current_char == ']') {
-                lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
-                ++current_pos;
+                if (lexer.ensure_nonzero_stack() && lexer.check_token_type(TokenType::LEFT_BRACKET)) {
+                    lexer.pop_token_type();
+                    lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
+                    ++current_pos;
+                } else {
+                    return PossibleExceptions::MalformedJsonException;
+                }
             } else if (current_char == ':') {
                 lex_token(lexer, TokenType::COLON, ":");
                 ++current_pos;
@@ -85,8 +97,12 @@ namespace {
                 while(current_pos < str_length && str_view[current_pos] != '"') {
                     ++current_pos;
                 }
-                lex_token(lexer, TokenType::STRING, std::string{str_view.substr(opening_idx, current_pos - opening_idx)});
-                ++current_pos;
+                if (current_pos < str_length && str_view[current_pos] == '"') { // check string has closing
+                    lex_token(lexer, TokenType::STRING, std::string{str_view.substr(opening_idx, current_pos - opening_idx)});
+                    ++current_pos;
+                } else {
+                    return PossibleExceptions::MalformedJsonException;
+                }                
             } else if (current_char == 't' && str_view.substr(current_pos, 4) == "true"sv) {
                 lex_token(lexer, TokenType::BOOLEAN, "true");
                 current_pos += 4;
@@ -115,6 +131,22 @@ void Lexer::pushback_token(const LexToken& token) {
 
 void Lexer::clear_tokens() {
     this->tokens.clear();
+}
+
+bool Lexer::ensure_nonzero_stack() {
+    return this->array_and_object_stack.size() > 0;
+}
+
+void Lexer::stack_token_type(const TokenType& type) {
+    this->array_and_object_stack.push(type);
+}
+
+bool Lexer::check_token_type(const TokenType& type) {
+    return this->array_and_object_stack.top() == type;
+}
+
+void Lexer::pop_token_type() {
+    this->array_and_object_stack.pop();
 }
 
 std::istream& operator >>(std::istream& is, Lexer& lexer) {
