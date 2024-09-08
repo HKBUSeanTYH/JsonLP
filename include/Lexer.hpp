@@ -3,11 +3,7 @@
 #include "LexToken.hpp"
 #include <vector>
 #include <stack>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string_view>
-#include <algorithm>
+
 class Lexer {
     std::vector<LexToken> tokens;
     std::stack<TokenType> array_and_object_stack;

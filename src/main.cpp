@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Lexer.hpp>
+#include <sstream>
 
 int main() {
     // std::cout << "Hello World from JsonLP\n";

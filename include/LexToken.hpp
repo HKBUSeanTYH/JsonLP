@@ -1,6 +1,7 @@
 #ifndef LEX_TOKEN_DEF
 #define LEX_TOKEN_DEF
 #include <string>
+#include <iostream>
 #include "TokenType.hpp"
 
 struct LexToken {

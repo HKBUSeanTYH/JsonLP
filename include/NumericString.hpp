@@ -1,8 +1,6 @@
 #ifndef NUMERIC_STRING_DEF
 #define NUMERIC_STRING_DEF
-#include "JsonLexerParserExceptions.hpp"
-#include "LexToken.hpp"
-#include "Lexer.hpp"
+#include <cctype>
 namespace NumericString {
     bool is_plus_or_minus(const char& c);
 
