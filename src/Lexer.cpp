@@ -64,11 +64,11 @@ namespace {
                 ++current_pos;
             } else if (current_char == '{') {
                 lex_token(lexer, TokenType::LEFT_BRACE, "{");
-                lexer.stack_token_type(TokenType::LEFT_BRACE);
+                lexer.push_stack(TokenType::LEFT_BRACE);
                 ++current_pos;
             } else if (current_char == '}') {
-                if (lexer.ensure_nonzero_stack() && lexer.check_token_type(TokenType::LEFT_BRACE)) {
-                    lexer.pop_token_type();
+                if (!lexer.is_stack_empty() && lexer.check_token_type(TokenType::LEFT_BRACE)) {
+                    lexer.pop_stack();
                     lex_token(lexer, TokenType::RIGHT_BRACE, "}");
                     ++current_pos;
                 } else {
@@ -76,11 +76,11 @@ namespace {
                 }
             } else if (current_char == '[') {
                 lex_token(lexer, TokenType::LEFT_BRACKET, "[");
-                lexer.stack_token_type(TokenType::LEFT_BRACKET);
+                lexer.push_stack(TokenType::LEFT_BRACKET);
                 ++current_pos;
             } else if (current_char == ']') {
-                if (lexer.ensure_nonzero_stack() && lexer.check_token_type(TokenType::LEFT_BRACKET)) {
-                    lexer.pop_token_type();
+                if (!lexer.is_stack_empty() && lexer.check_token_type(TokenType::LEFT_BRACKET)) {
+                    lexer.pop_stack();
                     lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
                     ++current_pos;
                 } else {
@@ -133,20 +133,26 @@ void Lexer::clear_tokens() {
     this->tokens.clear();
 }
 
-bool Lexer::ensure_nonzero_stack() {
-    return this->array_and_object_stack.size() > 0;
-}
-
-void Lexer::stack_token_type(const TokenType& type) {
-    this->array_and_object_stack.push(type);
+bool Lexer::is_stack_empty() {
+    return this->array_and_object_stack.empty();
 }
 
 bool Lexer::check_token_type(const TokenType& type) {
     return this->array_and_object_stack.top() == type;
 }
 
-void Lexer::pop_token_type() {
+void Lexer::push_stack(const TokenType& type) {
+    this->array_and_object_stack.push(type);
+}
+
+void Lexer::pop_stack() {
     this->array_and_object_stack.pop();
+}
+
+void Lexer::clear_stack() {
+    while(!this->is_stack_empty()) {
+        this->pop_stack();
+    }
 }
 
 std::istream& operator >>(std::istream& is, Lexer& lexer) {

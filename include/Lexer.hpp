@@ -16,10 +16,11 @@ class Lexer {
         void pushback_token(const LexToken&);
         void clear_tokens();
 
-        bool ensure_nonzero_stack();
-        void stack_token_type(const TokenType&);
+        bool is_stack_empty();
         bool check_token_type(const TokenType&);
-        void pop_token_type();
+        void push_stack(const TokenType&);
+        void pop_stack();
+        void clear_stack();
 
         friend std::istream& operator>>(std::istream&, Lexer&);
         friend std::istringstream& operator>>(std::istringstream&, Lexer&);
