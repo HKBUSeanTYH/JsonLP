@@ -1,6 +1,6 @@
 #include "Lexer.hpp"
 #include "NumericString.hpp"
-#include "JsonLexerParserExceptions.hpp"
+#include "JsonLPExceptions.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -12,7 +12,7 @@ namespace {
         lexer.pushback_token(LexToken {type, token_string});
     }
 
-    JsonLexerParserException validate_and_extract_numeric (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
+    JsonLPException validate_and_extract_numeric (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
         bool floating_point_found = false, exponential_found = false;
         size_t starting_pos {current_pos};
         if (NumericString::is_plus_minus_or_floating_point(sv[current_pos])) {
@@ -67,7 +67,7 @@ namespace {
         return {};
     }
 
-    JsonLexerParserException lex(std::istringstream& iss, Lexer& lexer) {
+    JsonLPException lex(std::istringstream& iss, Lexer& lexer) {
         using namespace std::literals;
         std::string_view str_view {iss.view()};
         size_t current_pos{0}, str_length {str_view.length()};
@@ -126,7 +126,7 @@ namespace {
                 lex_token(lexer, TokenType::NULL_TYPE, "null");
                 current_pos += 4;
             } else if (NumericString::is_valid_numeric_string_start(current_char)) {
-                JsonLexerParserException output {validate_and_extract_numeric(lexer, str_view, str_length, current_pos)};
+                JsonLPException output {validate_and_extract_numeric(lexer, str_view, str_length, current_pos)};
                 if (output.has_value()) {
                     return output;
                 }
@@ -144,7 +144,7 @@ std::istream& operator >>(std::istream& is, Lexer& lexer) {
         std::istreambuf_iterator<char> start(is), end;
         std::string input_str(start, end);
         std::istringstream iss{input_str};
-        JsonLexerParserException output {lex(iss, lexer)};
+        JsonLPException output {lex(iss, lexer)};
         if (output.has_value()) {
             iss.setstate(iss.rdstate() | std::ios_base::failbit);
         } 
@@ -157,7 +157,7 @@ std::istream& operator >>(std::istream& is, Lexer& lexer) {
 std::istringstream& operator >>(std::istringstream& iss, Lexer& lexer) {
     std::istringstream::sentry sentry{iss};  //trims leading whitespace
     if (sentry) {
-        JsonLexerParserException output {lex(iss, lexer)};
+        JsonLPException output {lex(iss, lexer)};
         if (output.has_value()) {
             iss.setstate(iss.rdstate() | std::ios_base::failbit);
         } 

@@ -6,5 +6,5 @@ enum PossibleExceptions {
     DataTypeMismatchException,  //incorrect data types(?)
     MalformedJsonException // trailing commas, unescaped (special) characters
 };
-using JsonLexerParserException = std::optional<PossibleExceptions>;
+using JsonLPException = std::optional<PossibleExceptions>;
 #endif

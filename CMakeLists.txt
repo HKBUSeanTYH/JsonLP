@@ -9,8 +9,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # source files
 set(SOURCES src/main.cpp src/Lexer/LexerStackVectorOperations.cpp src/Lexer/LexerStreamOperations.cpp src/LexToken.cpp src/NumericString.cpp)
+set(INCLUDES include)
 file(COPY resources DESTINATION .)
 
 # executable
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
