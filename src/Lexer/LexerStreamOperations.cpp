@@ -47,7 +47,11 @@ namespace {
                 current_pos += 2;
             } else if (current_char == ',' || current_char == '}' || current_char == ']' || std::isspace(current_char)) {
                 //if valid ending delimiter
-                lex_token(lexer, TokenType::NUMBER, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+                if (exponential_found || floating_point_found) {
+                    lex_token(lexer, TokenType::FLOATING_POINT, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+                } else {
+                    lex_token(lexer, TokenType::INTEGRAL, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+                }
                 return {};  //finished lexing numeric, break out
             } else {
                 return PossibleExceptions::MalformedJsonException; //invalid characters
@@ -55,7 +59,11 @@ namespace {
         }
         //if somehow string ended without breaking out, lex the token first and decide if it is malformed later
         //as the string could be completely numeric - "1234"
-        lex_token(lexer, TokenType::NUMBER, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+        if (exponential_found || floating_point_found) {
+            lex_token(lexer, TokenType::FLOATING_POINT, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+        } else {
+            lex_token(lexer, TokenType::INTEGRAL, std::string{sv.substr(starting_pos, current_pos-starting_pos)});
+        }
         return {};
     }
 

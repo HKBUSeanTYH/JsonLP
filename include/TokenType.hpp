@@ -9,7 +9,8 @@ enum class TokenType {
     COLON,
     COMMA,
     STRING,
-    NUMBER,
+    INTEGRAL,
+    FLOATING_POINT,
     BOOLEAN,
     NULL_TYPE
 };
