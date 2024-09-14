@@ -2,6 +2,7 @@
     "files.associations": {
         "iosfwd": "cpp",
         "string_view": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "variant": "cpp"
     }
 }
