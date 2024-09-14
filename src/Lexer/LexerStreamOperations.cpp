@@ -134,7 +134,7 @@ namespace {
                 return PossibleExceptions::MalformedJsonException;
             }
         }
-        return {};
+        return lexer.is_stack_empty() ? std::nullopt : JsonLPException{PossibleExceptions::MalformedJsonException};
     }
 }
 
