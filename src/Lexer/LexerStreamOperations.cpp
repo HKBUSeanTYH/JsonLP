@@ -12,7 +12,7 @@ namespace {
         lexer.pushback_token(LexToken {type, token_string});
     }
 
-    JsonLPException validate_and_extract_numeric (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
+    PossibleExceptions validate_and_extract_numeric (Lexer& lexer, const std::string_view& sv, const size_t& str_length , size_t& current_pos) {
         bool floating_point_found = false, exponential_found = false;
         size_t starting_pos {current_pos};
         if (NumericString::is_plus_minus_or_floating_point(sv[current_pos])) {
@@ -20,7 +20,7 @@ namespace {
                 floating_point_found = true;
             }
             if (!std::isdigit(sv[current_pos+1])) {
-                return PossibleExceptions::MalformedJsonException;
+                return JsonLPExceptions::MalformedJsonException;
             } 
             current_pos += 2;
         }
@@ -35,14 +35,14 @@ namespace {
                     exponential_found = true;
                     current_pos += 2;
                 } else {
-                    return PossibleExceptions::MalformedJsonException;
+                    return JsonLPExceptions::MalformedJsonException;
                 }
             } else if (current_char == '.' && !floating_point_found) {
                 //if floating point and no floating points seen before
                 floating_point_found = true;
                 if (!std::isdigit(sv[current_pos+1])) {
                     //floating point must be followed by digit
-                    return PossibleExceptions::MalformedJsonException;
+                    return JsonLPExceptions::MalformedJsonException;
                 } 
                 current_pos += 2;
             } else if (current_char == ',' || current_char == '}' || current_char == ']' || std::isspace(current_char)) {
@@ -54,7 +54,7 @@ namespace {
                 }
                 return {};  //finished lexing numeric, break out
             } else {
-                return PossibleExceptions::MalformedJsonException; //invalid characters
+                return JsonLPExceptions::MalformedJsonException; //invalid characters
             }
         }
         //if somehow string ended without breaking out, lex the token first and decide if it is malformed later
@@ -67,7 +67,7 @@ namespace {
         return {};
     }
 
-    JsonLPException lex(std::istringstream& iss, Lexer& lexer) {
+    PossibleExceptions lex(std::istringstream& iss, Lexer& lexer) {
         using namespace std::literals;
         std::string_view str_view {iss.view()};
         size_t current_pos{0}, str_length {str_view.length()};
@@ -85,7 +85,7 @@ namespace {
                     lex_token(lexer, TokenType::RIGHT_BRACE, "}");
                     ++current_pos;
                 } else {
-                    return PossibleExceptions::MalformedJsonException;
+                    return JsonLPExceptions::MalformedJsonException;
                 }
             } else if (current_char == '[') {
                 lex_token(lexer, TokenType::LEFT_BRACKET, "[");
@@ -97,7 +97,7 @@ namespace {
                     lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
                     ++current_pos;
                 } else {
-                    return PossibleExceptions::MalformedJsonException;
+                    return JsonLPExceptions::MalformedJsonException;
                 }
             } else if (current_char == ':') {
                 lex_token(lexer, TokenType::COLON, ":");
@@ -114,7 +114,7 @@ namespace {
                     lex_token(lexer, TokenType::STRING, std::string{str_view.substr(opening_idx, current_pos - opening_idx)});
                     ++current_pos;
                 } else {
-                    return PossibleExceptions::MalformedJsonException;
+                    return JsonLPExceptions::MalformedJsonException;
                 }                
             } else if (current_char == 't' && str_view.substr(current_pos, 4) == "true"sv) {
                 lex_token(lexer, TokenType::BOOLEAN, "true");
@@ -126,15 +126,15 @@ namespace {
                 lex_token(lexer, TokenType::NULL_TYPE, "null");
                 current_pos += 4;
             } else if (NumericString::is_valid_numeric_string_start(current_char)) {
-                JsonLPException output {validate_and_extract_numeric(lexer, str_view, str_length, current_pos)};
+                PossibleExceptions output {validate_and_extract_numeric(lexer, str_view, str_length, current_pos)};
                 if (output.has_value()) {
                     return output;
                 }
             } else {
-                return PossibleExceptions::MalformedJsonException;
+                return JsonLPExceptions::MalformedJsonException;
             }
         }
-        return lexer.is_stack_empty() ? std::nullopt : JsonLPException{PossibleExceptions::MalformedJsonException};
+        return lexer.is_stack_empty() ? std::nullopt : PossibleExceptions{JsonLPExceptions::MalformedJsonException};
     }
 }
 
@@ -144,7 +144,7 @@ std::istream& operator >>(std::istream& is, Lexer& lexer) {
         std::istreambuf_iterator<char> start(is), end;
         std::string input_str(start, end);
         std::istringstream iss{input_str};
-        JsonLPException output {lex(iss, lexer)};
+        PossibleExceptions output {lex(iss, lexer)};
         if (output.has_value()) {
             iss.setstate(iss.rdstate() | std::ios_base::failbit);
         } 
@@ -157,7 +157,7 @@ std::istream& operator >>(std::istream& is, Lexer& lexer) {
 std::istringstream& operator >>(std::istringstream& iss, Lexer& lexer) {
     std::istringstream::sentry sentry{iss};  //trims leading whitespace
     if (sentry) {
-        JsonLPException output {lex(iss, lexer)};
+        PossibleExceptions output {lex(iss, lexer)};
         if (output.has_value()) {
             iss.setstate(iss.rdstate() | std::ios_base::failbit);
         } 
