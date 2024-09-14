@@ -1,6 +1,6 @@
 #ifndef PARSER_DEF
 #define PARSER_DEF
-#include <vector>
+#include <deque>
 #include <variant>
 #include "LexToken.hpp"
 #include "JsonLPExceptions.hpp"
@@ -11,6 +11,6 @@ using JsonParsingResult = std::variant<std::monostate, JsonLPExceptions, JsonNod
 
 class Parser {
     public:
-        JsonParsingResult parseValue(const std::vector<LexToken>&);
+        JsonParsingResult parseValue(std::deque<LexToken>&);
 };
 #endif

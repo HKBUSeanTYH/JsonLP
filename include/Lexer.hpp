@@ -1,12 +1,13 @@
 #ifndef LEXER_DEF
 #define LEXER_DEF
 #include "LexToken.hpp"
+#include <deque>
 #include <vector>
 #include <stack>
 
 class Lexer {
-    std::vector<LexToken> tokens;
-    std::stack<TokenType, std::vector<TokenType>> array_and_object_stack;
+    std::deque<LexToken> tokens;
+    std::stack<TokenType, std::deque<TokenType>> array_and_object_stack;
     public:
         Lexer(): tokens{}, array_and_object_stack{} {};
         void pushback_token(const LexToken&);

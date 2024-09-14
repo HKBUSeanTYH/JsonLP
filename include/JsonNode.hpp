@@ -7,7 +7,7 @@
 #include <map>
 
 class JsonNode;
-using JsonVariant = std::variant<std::monostate, std::nullptr_t, int, double, bool, std::string, std::vector<JsonNode>, std::map<std::string, JsonNode>>;
+using JsonVariant = std::variant<std::monostate, std::nullptr_t, int, double, bool, std::string, std::deque<JsonNode>, std::map<std::string, JsonNode>>;
 template<class... Ts> 
 struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
