@@ -8,11 +8,11 @@ std::ostream& operator <<(std::ostream& os, JsonNode& json_val) {
         [&os](auto & val){ os << "\"" << val << "\""; },
         [&os](std::vector<JsonNode> &vec){
             os << "[ ";
-            for (size_t i = 0; i < vec.size(); ++i) {
-                if (i != 0) {
-                    os << ", ";
+            if (vec.size() >= 1) {
+                if (vec.size() > 1) {
+                    std::for_each_n(vec.begin(), vec.size()-1, [&os](JsonNode& token){ os << token << ", "; });
                 }
-                os << vec[i];
+                os << vec.at(vec.size()-1);
             }
             os << " ]";
         },
@@ -23,7 +23,7 @@ std::ostream& operator <<(std::ostream& os, JsonNode& json_val) {
                 if (i != begin) {
                     os << ", ";
                 }
-                os <<i->first << ":" << i->second;
+                os << "\"" << i->first << "\"" << " : " << i->second;
             }
             os << " }";
         }
