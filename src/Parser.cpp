@@ -37,8 +37,8 @@ namespace {
         if ((*curr).token_type != TokenType::COLON) { return JsonSyntaxException; }
         ++curr;
         const auto& val = parseValue(curr, end);
-        return std::visit(overloaded { [](const auto&){ std::cout<< "exception"; return PossibleExceptions{JsonSyntaxException}; }, 
-            [&obj, &key](const JsonNode& node){ std::cout<< "entered"; obj.emplace(key.value, node); return PossibleExceptions{}; } }, val);
+        return std::visit(overloaded { [](const auto&){ return PossibleExceptions{JsonSyntaxException}; }, 
+            [&obj, &key](const JsonNode& node){ obj.emplace(key.value, node); return PossibleExceptions{}; } }, val);
     }
     
     JsonParsingResult parseObject(std::vector<LexToken>::const_iterator& curr, std::vector<LexToken>::const_iterator& end) {
