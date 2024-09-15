@@ -1,10 +1,10 @@
 #include "Parser.hpp"
 
 namespace {
-    JsonParsingResult parseObject(std::vector<LexToken>::const_iterator&, std::vector<LexToken>::const_iterator&);
-    JsonParsingResult parseArray(std::vector<LexToken>::const_iterator&, std::vector<LexToken>::const_iterator&);
+    JsonParsingResult parseObject(std::vector<LexToken>::iterator&, std::vector<LexToken>::iterator&);
+    JsonParsingResult parseArray(std::vector<LexToken>::iterator&, std::vector<LexToken>::iterator&);
 
-    JsonParsingResult parseValue(std::vector<LexToken>::const_iterator& curr, std::vector<LexToken>::const_iterator& end) {
+    JsonParsingResult parseValue(std::vector<LexToken>::iterator& curr, std::vector<LexToken>::iterator& end) {
         auto& val {*curr};
         if (val.token_type == TokenType::LEFT_BRACE) {
             return parseObject(curr, end);
@@ -30,22 +30,22 @@ namespace {
         }
     }
 
-    PossibleExceptions parseKeyValueIntoMap(std::map<std::string, JsonNode>& obj, std::vector<LexToken>::const_iterator& curr, std::vector<LexToken>::const_iterator& end) {
+    PossibleExceptions parseKeyValueIntoMap(std::map<std::string, JsonNode>& obj, std::vector<LexToken>::iterator& curr, std::vector<LexToken>::iterator& end) {
         if ((*curr).token_type != TokenType::STRING) { return JsonSyntaxException; } 
         auto& key {*curr};
         ++curr;
         if ((*curr).token_type != TokenType::COLON) { return JsonSyntaxException; }
         ++curr;
-        const auto& val = parseValue(curr, end);
-        return std::visit(overloaded { [](const auto&){ return PossibleExceptions{JsonSyntaxException}; }, 
-            [&obj, &key](const JsonNode& node){ obj.emplace(key.value, node); return PossibleExceptions{}; } }, val);
+        auto val = parseValue(curr, end);
+        return std::visit(overloaded { [](auto&){ return PossibleExceptions{JsonSyntaxException}; }, 
+            [&obj, &key](JsonNode& node){ obj.emplace(key.value, node); return PossibleExceptions{}; } }, val);
     }
     
-    JsonParsingResult parseObject(std::vector<LexToken>::const_iterator& curr, std::vector<LexToken>::const_iterator& end) {
+    JsonParsingResult parseObject(std::vector<LexToken>::iterator& curr, std::vector<LexToken>::iterator& end) {
         std::map<std::string, JsonNode> obj{};
         ++curr;
         while (curr != end && (*curr).token_type != TokenType::RIGHT_BRACE) {
-            const auto& opt {parseKeyValueIntoMap(obj, curr, end)};
+            auto opt {parseKeyValueIntoMap(obj, curr, end)};
             if (opt.has_value()) {
                 return opt;
             }
@@ -59,13 +59,13 @@ namespace {
         return obj;
     }
 
-    JsonParsingResult parseArray(std::vector<LexToken>::const_iterator& curr, std::vector<LexToken>::const_iterator& end) {
+    JsonParsingResult parseArray(std::vector<LexToken>::iterator& curr, std::vector<LexToken>::iterator& end) {
         std::vector<JsonNode> vec{};
         ++curr;
         while (curr != end && (*curr).token_type != TokenType::RIGHT_BRACKET) {
-            const auto& result {parseValue(curr, end)};
-            const auto& opt = std::visit(overloaded { [](const auto&){ return PossibleExceptions{JsonSyntaxException}; }, 
-                [&vec](const JsonNode& node){ vec.push_back(node); return PossibleExceptions{}; } }, result);
+            auto result {parseValue(curr, end)};
+            auto opt = std::visit(overloaded { [](auto&){ return PossibleExceptions{JsonSyntaxException}; }, 
+                [&vec](JsonNode& node){ vec.push_back(node); return PossibleExceptions{}; } }, result);
             if (opt.has_value()) {
                 return opt;
             }
@@ -80,7 +80,7 @@ namespace {
     }
 }
 
-JsonParsingResult Parser::parse(const std::vector<LexToken>& tokens) {
+JsonParsingResult Parser::parse(std::vector<LexToken>& tokens) {
     size_t vec_size {tokens.size()};
     auto curr = tokens.begin();
     auto end = tokens.end();

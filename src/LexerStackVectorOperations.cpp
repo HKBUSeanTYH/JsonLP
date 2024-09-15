@@ -8,7 +8,7 @@ void Lexer::clear_tokens() {
     this->tokens.clear();
 }
 
-const std::vector<LexToken>& Lexer::get_tokens() {
+std::vector<LexToken>& Lexer::get_tokens() {
     return this->tokens;
 }
 

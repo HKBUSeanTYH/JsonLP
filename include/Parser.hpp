@@ -11,6 +11,6 @@ using JsonParsingResult = std::variant<std::monostate, PossibleExceptions, JsonN
 
 class Parser {
     public:
-        JsonParsingResult parse(const std::vector<LexToken>&);
+        JsonParsingResult parse(std::vector<LexToken>&);
 };
 #endif

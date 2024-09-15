@@ -11,7 +11,7 @@ class Lexer {
         Lexer(): tokens{}, array_and_object_stack{} {};
         void pushback_token(const LexToken&);
         void clear_tokens();
-        const std::vector<LexToken>& get_tokens();
+        std::vector<LexToken>& get_tokens();
 
         bool is_stack_empty();
         bool check_token_type(const TokenType&);
