@@ -4,8 +4,8 @@ std::ostream& operator <<(std::ostream& os, JsonNode& json_val) {
     std::visit(overloaded{
         [&os](std::monostate &){ os << "Empty JsonValue"; }, // An uninitialized json object, probably an error
         [&os](std::nullptr_t &){ os << "null";},
-        [&os](std::string &){ os << "null";},
-        [&os](auto & val){ os << "\"" << val << "\""; },
+        [&os](std::string & val){ os << "\"" << val << "\"";},
+        [&os](auto & val){ os << val; },
         [&os](std::vector<JsonNode> &vec){
             os << "[ ";
             if (vec.size() >= 1) {
@@ -23,7 +23,7 @@ std::ostream& operator <<(std::ostream& os, JsonNode& json_val) {
                 if (i != begin) {
                     os << ", ";
                 }
-                os << "\"" << i->first << "\"" << " : " << i->second;
+                os << "\"" << i->first << "" << " : " << i->second;
             }
             os << " }";
         }
