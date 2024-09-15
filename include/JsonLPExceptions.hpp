@@ -4,7 +4,10 @@
 enum JsonLPExceptions {
     JsonSyntaxException,  // missing/extra commas, improper use of quotes, mismatched brackets/braces
     DataTypeMismatchException,  //incorrect data types(?)
-    MalformedJsonException // trailing commas, unescaped (special) characters
+    UnexpectedEndOfInputException,
+    InvalidNumberFormatException,
+    UnclosedStringException
+
 };
 using PossibleExceptions = std::optional<JsonLPExceptions>;
 #endif

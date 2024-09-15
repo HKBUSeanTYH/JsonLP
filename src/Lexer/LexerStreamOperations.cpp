@@ -20,7 +20,7 @@ namespace {
                 floating_point_found = true;
             }
             if (!std::isdigit(sv[current_pos+1])) {
-                return JsonLPExceptions::MalformedJsonException;
+                return JsonLPExceptions::InvalidNumberFormatException;
             } 
             current_pos += 2;
         }
@@ -35,14 +35,14 @@ namespace {
                     exponential_found = true;
                     current_pos += 2;
                 } else {
-                    return JsonLPExceptions::MalformedJsonException;
+                    return JsonLPExceptions::InvalidNumberFormatException;
                 }
             } else if (current_char == '.' && !floating_point_found) {
                 //if floating point and no floating points seen before
                 floating_point_found = true;
                 if (!std::isdigit(sv[current_pos+1])) {
                     //floating point must be followed by digit
-                    return JsonLPExceptions::MalformedJsonException;
+                    return JsonLPExceptions::InvalidNumberFormatException;
                 } 
                 current_pos += 2;
             } else if (current_char == ',' || current_char == '}' || current_char == ']' || std::isspace(current_char)) {
@@ -54,7 +54,7 @@ namespace {
                 }
                 return {};  //finished lexing numeric, break out
             } else {
-                return JsonLPExceptions::MalformedJsonException; //invalid characters
+                return JsonLPExceptions::InvalidNumberFormatException; //invalid characters
             }
         }
         //if somehow string ended without breaking out, lex the token first and decide if it is malformed later
@@ -85,7 +85,7 @@ namespace {
                     lex_token(lexer, TokenType::RIGHT_BRACE, "}");
                     ++current_pos;
                 } else {
-                    return JsonLPExceptions::MalformedJsonException;
+                    return JsonLPExceptions::JsonSyntaxException;
                 }
             } else if (current_char == '[') {
                 lex_token(lexer, TokenType::LEFT_BRACKET, "[");
@@ -97,7 +97,7 @@ namespace {
                     lex_token(lexer, TokenType::RIGHT_BRACKET, "]");
                     ++current_pos;
                 } else {
-                    return JsonLPExceptions::MalformedJsonException;
+                    return JsonLPExceptions::JsonSyntaxException;
                 }
             } else if (current_char == ':') {
                 lex_token(lexer, TokenType::COLON, ":");
@@ -114,7 +114,7 @@ namespace {
                     lex_token(lexer, TokenType::STRING, std::string{str_view.substr(opening_idx, current_pos - opening_idx)});
                     ++current_pos;
                 } else {
-                    return JsonLPExceptions::MalformedJsonException;
+                    return JsonLPExceptions::UnclosedStringException;
                 }                
             } else if (current_char == 't' && str_view.substr(current_pos, 4) == "true"sv) {
                 lex_token(lexer, TokenType::BOOLEAN, "true");
@@ -131,10 +131,10 @@ namespace {
                     return output;
                 }
             } else {
-                return JsonLPExceptions::MalformedJsonException;
+                return JsonLPExceptions::JsonSyntaxException;
             }
         }
-        return lexer.is_stack_empty() ? std::nullopt : PossibleExceptions{JsonLPExceptions::MalformedJsonException};
+        return lexer.is_stack_empty() ? std::nullopt : PossibleExceptions{JsonLPExceptions::UnexpectedEndOfInputException};
     }
 }
 
