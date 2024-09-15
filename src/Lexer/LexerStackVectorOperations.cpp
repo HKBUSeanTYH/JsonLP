@@ -8,6 +8,10 @@ void Lexer::clear_tokens() {
     this->tokens.clear();
 }
 
+const std::vector<LexToken>& Lexer::get_tokens() {
+    return this->tokens;
+}
+
 bool Lexer::is_stack_empty() {
     return this->array_and_object_stack.empty();
 }
