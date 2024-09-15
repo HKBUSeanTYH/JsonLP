@@ -23,7 +23,7 @@ std::ostream& operator <<(std::ostream& os, JsonNode& json_val) {
                 if (i != begin) {
                     os << ", ";
                 }
-                os << "\"" << i->first << "" << " : " << i->second;
+                os << "\"" << i->first << "\"" << " : " << i->second;
             }
             os << " }";
         }
