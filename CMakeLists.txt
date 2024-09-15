@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # enable_testing()
 
 # source files
-set(SOURCES src/Lexer/LexerStackVectorOperations.cpp src/Lexer/LexerStreamOperations.cpp src/Parser/Parser.cpp src/JsonNode.cpp src/LexToken.cpp src/NumericString.cpp src/main.cpp)
+set(SOURCES src/LexerStackVectorOperations.cpp src/LexerStreamOperations.cpp src/Parser.cpp src/JsonNode.cpp src/LexToken.cpp src/NumericString.cpp src/main.cpp)
 set(INCLUDES include)
 file(COPY resources DESTINATION .)
 

@@ -7,7 +7,7 @@
 #include "JsonNode.hpp"
 
 //TODO: JsonNode/JsonVariant class
-using JsonParsingResult = std::variant<std::monostate, JsonLPExceptions, JsonNode>;
+using JsonParsingResult = std::variant<std::monostate, PossibleExceptions, JsonNode>;
 
 class Parser {
     public:

@@ -26,7 +26,7 @@ namespace {
             ++curr;
             return nullptr;
         } else {
-            return JsonLPExceptions::JsonSyntaxException;
+            return PossibleExceptions{JsonSyntaxException};
         }
     }
 
@@ -37,20 +37,24 @@ namespace {
         if ((*curr).token_type != TokenType::COLON) { return JsonSyntaxException; }
         ++curr;
         const auto& val = parseValue(curr, end);
-        return std::visit(overloaded { [](auto&){ return JsonSyntaxException; }, [&obj, &key](JsonNode& node){ obj.emplace(key.value, node); return std::nullopt; } }, val);
+        return std::visit(overloaded { [](const auto&){ std::cout<< "exception"; return PossibleExceptions{JsonSyntaxException}; }, 
+            [&obj, &key](const JsonNode& node){ std::cout<< "entered"; obj.emplace(key.value, node); return PossibleExceptions{}; } }, val);
     }
     
     JsonParsingResult parseObject(std::vector<LexToken>::const_iterator& curr, std::vector<LexToken>::const_iterator& end) {
         std::map<std::string, JsonNode> obj{};
         ++curr;
         while (curr != end && (*curr).token_type != TokenType::RIGHT_BRACE) {
-            parseKeyValueIntoMap(obj, curr, end);
+            const auto& opt {parseKeyValueIntoMap(obj, curr, end)};
+            if (opt.has_value()) {
+                return opt;
+            }
             if ((*curr).token_type == TokenType::COMMA) {
                 ++curr;
                 continue;
             }
         }
-        if ((*curr).token_type != TokenType::RIGHT_BRACE) { return JsonSyntaxException; }
+        if ((*curr).token_type != TokenType::RIGHT_BRACE) { return PossibleExceptions{JsonSyntaxException}; }
         ++curr;
         return obj;
     }
@@ -60,13 +64,17 @@ namespace {
         ++curr;
         while (curr != end && (*curr).token_type != TokenType::RIGHT_BRACKET) {
             const auto& result {parseValue(curr, end)};
-            std::visit(overloaded { [](auto&){ return JsonSyntaxException; }, [&vec](JsonNode& node){ vec.push_back(node); return std::nullopt; } }, result);
+            const auto& opt = std::visit(overloaded { [](const auto&){ return PossibleExceptions{JsonSyntaxException}; }, 
+                [&vec](const JsonNode& node){ vec.push_back(node); return PossibleExceptions{}; } }, result);
+            if (opt.has_value()) {
+                return opt;
+            }
             if ((*curr).token_type == TokenType::COMMA) {
                 ++curr;
                 continue;
             }
         }
-        if ((*curr).token_type != TokenType::RIGHT_BRACKET) { return JsonSyntaxException; }
+        if ((*curr).token_type != TokenType::RIGHT_BRACKET) { return PossibleExceptions{JsonSyntaxException}; }
         ++curr;
         return vec;
     }
@@ -82,12 +90,12 @@ JsonParsingResult Parser::parse(const std::vector<LexToken>& tokens) {
         } else if (tokens[0].token_type == TokenType::LEFT_BRACKET && tokens[vec_size-1].token_type == TokenType::RIGHT_BRACKET) {
             return parseArray(curr, end);
         } else {
-            return JsonParsingResult{JsonLPExceptions::JsonSyntaxException};
+            return JsonParsingResult{PossibleExceptions{JsonSyntaxException}};
         }
     } else if (vec_size == 1) {
         //token must be a value type token
         return parseValue(curr, end);
     } else {
-        return JsonParsingResult{JsonLPExceptions::JsonSyntaxException};
+        return JsonParsingResult{PossibleExceptions{JsonSyntaxException}};
     }
 }

@@ -14,6 +14,7 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 class JsonNode : public JsonVariant {
     friend std::ostream& operator <<(std::ostream&, JsonNode&);
+    friend std::ostream& operator <<(std::ostream&, const JsonNode&);
     public:
         using JsonVariant::JsonVariant;
 };
