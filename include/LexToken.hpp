@@ -9,6 +9,7 @@ struct LexToken {
     std::string value;
 
     LexToken() = delete;
+    //cpp idiom: pass-by-value-then-move 
     explicit LexToken(TokenType t, std::string s) : token_type{t}, value{std::move(s)} {};
     friend std::ostream& operator<<(std::ostream&, LexToken&);
 };
