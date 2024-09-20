@@ -9,7 +9,7 @@ struct LexToken {
     std::string value;
 
     LexToken() = delete;
-    explicit LexToken(const TokenType t, const std::string s) : token_type{t}, value{s} {};
+    explicit LexToken(TokenType t, std::string s) : token_type{t}, value{std::move(s)} {};
     friend std::ostream& operator<<(std::ostream&, LexToken&);
 };
 
